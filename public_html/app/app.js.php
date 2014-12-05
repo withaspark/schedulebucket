@@ -9,12 +9,11 @@ elseif ($_GET['cid'] != "")
 	$scrollTo = "#cat_".$cid;
 
 
-$length_of_tasks = 200;					// Sets maxlength of tasks
+$length_of_tasks = 200; // Sets maxlength of tasks
 
 
 // Hide if not requested by app
-$base_url = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'].'app/';
-if (strpos($base_url)) {
+if (strpos($_SERVER['HTTP_REFERER'], dirname($_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']))) {
 	// Add headers for type detection
 	header("Content-type: text/javascript");
 	header("X-Content-Type-Options: nosniff");

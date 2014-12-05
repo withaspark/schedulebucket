@@ -1,6 +1,5 @@
 RewriteEngine on
 Options +FollowSymlinks
-RewriteOptions MaxRedirects=5
 
 RewriteRule ^([0-9a-zA-Z_]+)$ /schedulebucket/app/$1/ [R]
 RewriteRule ^([0-9a-zA-Z_]+)/$ /schedulebucket/app/index.php?group=$1
