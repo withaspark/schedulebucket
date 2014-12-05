@@ -443,7 +443,7 @@ else {
 	<title>Schedule Bucket Basic Javascript</title>
 	<meta name="robots" content="noindex, nofollow">
 	<link rel="stylesheet" href="app.css.php" type="text/css" />
-	<link rel="icon" href="../misc/favicon.ico" />
+	<link rel="icon" href="../misc/favicon.png" />
 
 	<style type="text/css">
 	#billboard {

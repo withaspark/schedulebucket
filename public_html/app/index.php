@@ -142,7 +142,7 @@ if ($group_name != "") {
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.7.0/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="//tablednd.googlecode.com/svn/trunk/js/jquery.tablednd.js"></script>
-	<link rel="icon" href="../../misc/favicon.ico" />
+	<link rel="icon" href="../../misc/favicon.png" />
 </head>
 <body>
 	<div id="top">
@@ -341,7 +341,7 @@ else {
 	<meta name="robots" content="noindex, nofollow">
 	<link rel="stylesheet" href="app.css.php" type="text/css" />
 	<link rel="stylesheet" href="../app.css.php" type="text/css" />
-	<link rel="icon" href="../../misc/favicon.ico" />
+	<link rel="icon" href="../../misc/favicon.png" />
 
 	<style type="text/css">
 	#billboard {

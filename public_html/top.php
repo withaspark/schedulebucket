@@ -6,7 +6,7 @@
 
 	<link rel="stylesheet" href="style.css" type="text/css" />
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
-	<link rel="icon" href="misc/favicon.ico" />
+	<link rel="icon" href="misc/favicon.png" />
 </head>
 <body>
 	<div id="top">
