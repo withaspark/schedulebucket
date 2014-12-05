@@ -20,8 +20,8 @@ if (isset($_GET['to_order'])) {
 		$rows[$ctr] = intval($rows[$ctr]);
 			$tid = $rows[$ctr];
 		$ctr_plus = $ctr + 1;
-		$query = "UPDATE tasks SET cid=".$cid.",task_order=".$ctr_plus.",status=".$status." WHERE gid=$group AND tid=$tid";
-		mysql_query($query);
+		$statement = $dbhPDO->prepare("UPDATE tasks SET cid=?,task_order=?,status=? WHERE gid=? AND tid=?");
+		$statement->execute(array($cid, $ctr_plus, $status, $group, $tid));
 		$ctr++;
 	}
 }
@@ -38,8 +38,8 @@ elseif (isset($_GET['row_order'])) {
 		$rows[$ctr] = intval($rows[$ctr]);
 			$cat_order = $rows[$ctr];
 		$ctr_plus = $ctr + 1;
-		$query = "UPDATE categories SET cat_order=".$ctr_plus." WHERE gid=$group AND cid=$cat_order";
-		mysql_query($query);
+		$statement = $dbhPDO->prepare("UPDATE categories SET cat_order=? WHERE gid=? AND cid=?");
+		$statement->execute(array($ctr_plus, $group, $cat_order));
 		$ctr++;
 	}
 }

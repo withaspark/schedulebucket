@@ -5,9 +5,19 @@
 include("../../connect_2db.php");
 
 $group_name = filter_var($_GET['group'], FILTER_SANITIZE_SPECIAL_CHARS);
-$group_info = @mysql_fetch_array(mysql_query("SELECT gid,name FROM units WHERE nameshort='$group_name' LIMIT 1"));
+$statement = $dbhPDO->prepare("SELECT gid,name FROM units WHERE nameshort=? LIMIT 1");
+$statement->execute(array($group_name));
+// Make sure we got something
+if ($statement->rowCount() > 0) {
+	$group_info = $statement->fetch();
 	$group = $group_info['gid'];
 	$group_name = $group_info['name'];
+}
+// If group doesn't exist throw 404
+else {
+	header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+	$group_name = "";
+}
 
 
 
@@ -22,8 +32,10 @@ if (isset($_POST['new_task_name']) && $_POST['new_task_name'] != "" && isset($_P
 	$tid = mysql_fetch_array(mysql_query("SELECT tid FROM tasks ORDER BY tid DESC LIMIT 1"));
 		$tid = $tid['tid'] + 1;
 		$tid_carry = $tid;
-	$order = mysql_fetch_array(mysql_query("SELECT task_order FROM tasks WHERE gid=$group AND cid=$cid ORDER BY task_order DESC LIMIT 1"));
-		$order = intval($order['task_order']) + 1;
+	$statement = $dbhPDO->prepare("SELECT task_order FROM tasks WHERE gid=? AND cid=? ORDER BY task_order DESC LIMIT 1");
+	$statement->execute(array($group, $cid));
+	$found = $statement->fetch();
+		$order = intval($found['task_order']) + 1;
 	$status = 1;
 
 	if ($color == "color1")
@@ -33,13 +45,13 @@ if (isset($_POST['new_task_name']) && $_POST['new_task_name'] != "" && isset($_P
 	if (false) {
 		$order = 1;
 		// Increment all existing tasks so can make first
-		$query = "UPDATE tasks SET task_order=task_order+1 WHERE gid=$group AND cid=$cid";
-		mysql_query($query);
+		$statement = $dbhPDO->prepare("UPDATE tasks SET task_order=task_order+1 WHERE gid=? AND cid=?");
+		$statement->execute(array($group, $cid));
 	}
 
 	// Add new task as first in list
-	$query = "INSERT INTO tasks (tid,gid,status,cid,task_order,description,color) VALUES ($tid,$group,$status,$cid,$order,'$name','$color')";
-	mysql_query($query);
+	$statement = $dbhPDO->prepare("INSERT INTO tasks (tid,gid,status,cid,task_order,description,color) VALUES (?,?,?,?,?,?,?)");
+	$statement->execute(array($tid,$group,$status,$cid,$order,$name,$color));
 }
 /***********************************************
 / Add new category
@@ -49,12 +61,14 @@ elseif (isset($_POST['new_cat']) && $_POST['new_cat'] != "") {
 	$cid = mysql_fetch_array(mysql_query("SELECT cid FROM categories ORDER BY cid DESC LIMIT 1"));
 		$cid = $cid['cid'] + 1;
 		$cid_carry = $cid;
-	$order = mysql_fetch_array(mysql_query("SELECT cat_order FROM categories WHERE gid=$group ORDER BY cat_order DESC LIMIT 1"));
+	$statement = $dbhPDO->prepare("SELECT cat_order FROM categories WHERE gid=? ORDER BY cat_order DESC LIMIT 1");
+	$statement->execute(array($group));
+	$order = $statement->fetch();
 		$order = $order['cat_order'] + 1;
 	$name = filter_var($_POST['new_cat'], FILTER_SANITIZE_SPECIAL_CHARS);
 	$status = 1;
-	$query = "INSERT into categories (cid,gid,name,cat_order,status) VALUES ($cid,$group,'$name',$order,$status)";
-	mysql_query($query);
+	$statement = $dbhPDO->prepare("INSERT into categories (cid,gid,name,cat_order,status) VALUES (?,?,?,?,?)");
+	$statement->execute(array($cid,$group,$name,$order,$status));
 }
 /***********************************************
 / Rename category or delete category
@@ -66,14 +80,16 @@ elseif (isset($_POST['edit_cat_name'])) {
 
 	// If deleting category
 	if (strpos($new_name,"DELETE") > 0 && strpos($new_name,"cid=") > 0) {
-		$query = "DELETE FROM categories WHERE cid=".$cid;
-		mysql_query("DELETE FROM tasks WHERE cid=".$cid);
+		$statement = $dbhPDO->prepare("DELETE FROM categories WHERE cid=?");
+		$statement->execute(array($cid));
+		$statement = $dbhPDO->prepare("DELETE FROM tasks WHERE cid=?");
+		$statement->execute(array($cid));
 	}
 	// If renaming category
-	else
-		$query = "UPDATE categories SET name='".$new_name."' WHERE cid=".$cid." LIMIT 1";
-	
-	mysql_query($query);
+	else {
+		$statement = $dbhPDO->prepare("UPDATE categories SET name=? WHERE cid=? LIMIT 1");
+		$statement->execute(array($new_name, $cid));
+	}
 }
 /***********************************************
 / Renaming or deleting tasks
@@ -87,15 +103,16 @@ elseif (isset($_POST['edit_task_name'])) {
 	$query = "";
 	// If deleting task
 	if (strpos($new_name,"DELETE") > 0 && strpos($new_name,"tid=") > 0) {
-		$query = "DELETE FROM tasks WHERE tid=".$tid;
+		$statement = $dbhPDO->prepare("DELETE FROM tasks WHERE tid=?");
+		$statement->execute(array($tid));
 	}
 	// If renaming task
 	else {
 		if ($new_color == "color1")
 			$new_color = "";
-		$query = "UPDATE tasks SET description='$new_name',color='$new_color' WHERE tid=".$tid." LIMIT 1";
-	}	
-	mysql_query($query);
+		$statement = $dbhPDO->prepare("UPDATE tasks SET description=?,color=? WHERE tid=? LIMIT 1");
+		$statement->execute(array($new_name, $new_color, $tid));
+	}
 }
 
 
@@ -105,18 +122,20 @@ elseif (isset($_POST['edit_task_name'])) {
 /***********************************************
 / Get categories and tasks for table
 ***********************************************/
-$categories = mysql_query("SELECT cid,status,name FROM categories WHERE gid=$group ORDER BY cat_order");
-$tasks = mysql_query("SELECT tid,tasks.cid,tasks.status,task_order,description,color FROM tasks INNER JOIN categories ON categories.cid=tasks.cid WHERE tasks.gid=$group ORDER BY categories.cat_order,tasks.status,task_order");
+$categories = $dbhPDO->prepare("SELECT cid,status,name FROM categories WHERE gid=? ORDER BY cat_order");
+	$categories->execute(array($group));
+$tasks = $dbhPDO->prepare("SELECT tid,tasks.cid,tasks.status,task_order,description,color FROM tasks INNER JOIN categories ON categories.cid=tasks.cid WHERE tasks.gid=? ORDER BY categories.cat_order,tasks.status,task_order");
+	$tasks->execute(array($group));
 
 $num_of_cols = 3;		// to do, in progress, done
 $num_of_colors = 21;		// Number of colors for tasks
 
 $num_of_cats = 0;
-for ($ctr = 0; $cat_arr[$ctr] = mysql_fetch_array($categories); $ctr++) {
+for ($ctr = 0; $cat_arr[$ctr] = $categories->fetch(); $ctr++) {
 	$num_of_cats++;
 }
 $num_of_tasks = 0;
-for ($ctr = 0; $tasks_arr[$ctr] = mysql_fetch_array($tasks); $ctr++) {
+for ($ctr = 0; $tasks_arr[$ctr] = $tasks->fetch(); $ctr++) {
 	$num_of_tasks++;
 }
 
@@ -267,31 +286,10 @@ if ($group_name != "") {
 
 
 
-			<div id="settings" title="Settings" style="display: none;">
-				<h3>Account Settings</h3>
-
-				<h4>This setting</h4>
-				<p>Some options.</p>
-
-				<h4>That setting</h4>
-				<p>Some more options.</p>
-
-				<form action="" method="post" id="settings_form">
-				</form>
-			</div>
-
-
-
 			<input type="hidden" style="width: 80%;" id="script_feedback_task" />
 			<input type="hidden" style="width: 80%;" id="script_feedback_from" />
 			<input type="hidden" style="width: 80%;" id="script_feedback_to" />
 			<input type="hidden" style="width: 80%;" id="script_feedback_order" />
-
-			<!--
-			<div id="ajax" style="margin-top: 2em;">
-				<pre><?php /*echo "_GET: "; print_r($_GET); echo "_POST: "; print_r($_POST);*/ ?></pre>
-			</div>
-			-->
 
 			<script type="text/javascript" src="../app.js.php?gid=<?php echo $group; ?>&cid=<?php echo $cid_carry; ?>&tid=<?php echo $tid_carry; ?>"></script>
 		</div>

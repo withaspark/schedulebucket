@@ -4,7 +4,3 @@
 echo "Adding database and creating webuser..."
 mysql <schedulebucket.sql
 
-# Update permissions on emails.php for collecting signups
-echo "Setting permissions on signup form..."
-chgrp www-data public_html/emails.php
-chmod 0640 public_html/emails.php

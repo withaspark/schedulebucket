@@ -22,6 +22,12 @@ h1 {
 	font-weight: lighter;
 	text-align: center;
 }
+h2 {
+	font-size: x-large;
+	font-weight: lighter;
+	padding: 0em 0px .75em 0px;
+	text-align: center;
+}
 h3 {
 	font-size: large;
 	font-weight: lighter;
@@ -143,26 +149,27 @@ input.text-wide { width: 350px; }
 
 
 #billboard {
-	height: 300px;
 	margin: 0px 0px 50px 0px;
+	padding: 2em 0px;
 	border: #ddd solid 10px;
-	overflow: hidden !important;
 	background-color: #fff;
 }
-#billboard img {
-	width: 100%;
-	height: auto !important;
-}
+
 
 
 #footer {
 	width: 780px;
-	padding: 12px 10px 0px 10px;
 	margin: 3em auto 3em auto;
+	padding: 10px;
 	background-color: #fff;
 	border: #ccc solid 1px;
+	line-height: 1.5em;
+	opacity: 0.75;
 }
 	#footer .float-right { color: #ccc; }
+	#footer p {
+		padding-bottom: 0px;
+	}
 /***** End Main Element Syles *****/
 
 
