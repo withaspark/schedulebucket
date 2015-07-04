@@ -464,7 +464,7 @@ else {
 		<div class="centered">
 		<h1>Schedule Bucket Basic Javascript</h1>
 
-		<p class="centered">Copyright &copy;2009 <a href="http://withaspark.com/">Stephen Parker</a>. All rights reserved</p>
+		<p class="centered">Copyright &copy;2009 <a href="http://stephenparker.io">Stephen Parker</a>. All rights reserved</p>
 		<p class="centered">You are not authorized to view this script.</p>
 
 		</div>

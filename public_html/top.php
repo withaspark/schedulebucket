@@ -15,7 +15,7 @@
 			<p class="float-right">
 				<a href="index.php" <?php if ($page == "home") echo "class='current'";?>>Home</a>
 				<a href="app/demo/">Demo</a>
-				<a href="https://github.com/withaspark/schedulebucket">Source Code</a>
+				<a href="https://github.com/stephenparkerio/schedulebucket">Source Code</a>
 			</p>
 			<p class="clear"></p>
 		</div>
